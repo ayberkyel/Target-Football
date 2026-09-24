@@ -5,10 +5,10 @@ import random
 # Sayfa Yapılandırması
 st.set_page_config(page_title="Target Football", page_icon="⚽", layout="centered")
 
-# Seken Futbol Topları & Canlı Tema
+# CSS: Seken Toplar, Canlı Tema ve Özel Kale Çerçevesi
 st.markdown("""
 <style>
-    /* Streamlit katmanlarını şeffaf yap */
+    /* Katmanları şeffaf yap */
     header, [data-testid="stHeader"], [data-testid="stSidebar"], 
     .main, [data-testid="stAppViewContainer"] > section,
     [data-testid="stVerticalBlock"] {
@@ -16,14 +16,14 @@ st.markdown("""
         background-color: transparent !important;
     }
 
-    /* Arka Plan Koyu Zemin */
+    /* Arka Plan */
     html, body, [data-testid="stAppViewContainer"], .stApp {
         background-color: #0c121e !important;
         color: #f8fafc !important;
         overflow-x: hidden !important;
     }
 
-    /* --- SEKEN FUTBOL TOPLARI ANİMASYONU --- */
+    /* --- SEKEN FUTBOL TOPLARI --- */
     .balls-container {
         position: fixed;
         top: 0;
@@ -32,7 +32,7 @@ st.markdown("""
         height: 100vh;
         overflow: hidden;
         z-index: 0;
-        pointer-events: none; /* Tıklamaları butonlara geçirir */
+        pointer-events: none;
     }
 
     .ball {
@@ -43,27 +43,13 @@ st.markdown("""
     }
 
     @keyframes bounceFloat {
-        0% {
-            transform: translateY(0) rotate(0deg) scale(0.9);
-            opacity: 0;
-        }
-        10% {
-            opacity: 0.35;
-        }
-        50% {
-            transform: translateY(-55vh) translateX(60px) rotate(360deg) scale(1.1);
-            opacity: 0.45;
-        }
-        85% {
-            opacity: 0.35;
-        }
-        100% {
-            transform: translateY(-115vh) translateX(-40px) rotate(720deg) scale(0.9);
-            opacity: 0;
-        }
+        0% { transform: translateY(0) rotate(0deg) scale(0.9); opacity: 0; }
+        10% { opacity: 0.35; }
+        50% { transform: translateY(-55vh) translateX(60px) rotate(360deg) scale(1.1); opacity: 0.45; }
+        85% { opacity: 0.35; }
+        100% { transform: translateY(-115vh) translateX(-40px) rotate(720deg) scale(0.9); opacity: 0; }
     }
 
-    /* Farklı konumlarda, hızlarda ve boyutlarda toplar */
     .b1 { left: 8%;  font-size: 38px; animation-duration: 11s; animation-delay: 0s; }
     .b2 { left: 24%; font-size: 55px; animation-duration: 16s; animation-delay: 2s; }
     .b3 { left: 45%; font-size: 32px; animation-duration: 13s; animation-delay: 4.5s; }
@@ -72,32 +58,53 @@ st.markdown("""
     .b6 { left: 15%; font-size: 48px; animation-duration: 15s; animation-delay: 8s; }
     .b7 { left: 78%; font-size: 35px; animation-duration: 14s; animation-delay: 9.5s; }
 
-    /* İçerikleri öne al */
-    .main-title, .sub-title, div.stButton, .target-card, .score-card {
+    /* --- KALE DİREĞİ & FİLE ÇERÇEVESİ (GOALPOST & NET) --- */
+    .goal-frame {
         position: relative;
         z-index: 1;
+        /* Beyaz Parlak Kale Direkleri (Sol, Üst, Sağ) */
+        border-top: 7px solid #f1f5f9;
+        border-left: 7px solid #e2e8f0;
+        border-right: 7px solid #e2e8f0;
+        border-bottom: 2px solid rgba(226, 232, 240, 0.2);
+        border-radius: 12px 12px 0 0;
+        padding: 30px 25px 25px 25px;
+        margin-top: 10px;
+        margin-bottom: 25px;
+        /* Kale Direği Işıması */
+        box-shadow: 0 -4px 20px rgba(248, 250, 252, 0.25), 
+                    inset 0 0 25px rgba(56, 189, 248, 0.08);
+        
+        /* Saydam File Deseni (Yazıyı kapatmayacak kadar hafif grid) */
+        background-color: rgba(15, 23, 42, 0.65);
+        background-image: 
+            linear-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+        background-size: 26px 26px;
+        backdrop-filter: blur(4px);
     }
 
+    /* Başlıklar & Metinler */
     .main-title {
-        font-size: 46px;
+        font-size: 44px;
         font-weight: 900;
         font-style: italic;
         color: #38bdf8 !important;
         text-align: center;
         letter-spacing: 2px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        text-shadow: 0 4px 16px rgba(56, 189, 248, 0.4);
     }
     .sub-title {
         text-align: center;
-        color: #94a3b8 !important;
+        color: #cbd5e1 !important;
         font-size: 16px;
-        margin-bottom: 35px;
+        margin-bottom: 25px;
     }
 
     /* Menü Kart Butonları */
     div.stButton > button[key="btn_market"], div.stButton > button[key="btn_height"] {
         background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
-        background-color: #0284c7 !important;
         color: #041017 !important;
         border: none !important;
         border-radius: 20px !important;
@@ -148,7 +155,7 @@ st.markdown("""
         border-color: #38bdf8 !important;
     }
 
-    /* Standart Aksiyon Butonları */
+    /* Standart Butonlar */
     div.stButton > button:not([key="btn_market"]):not([key="btn_height"]):not([key="btn_top_menu"]) {
         width: 100% !important;
         background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
@@ -199,7 +206,7 @@ st.markdown("""
 
     div[data-baseweb="input"], div[data-baseweb="select"] > div {
         background-color: rgba(30, 41, 59, 0.95) !important;
-        border: 1px solid #334155 !important;
+        border: 1px solid #475569 !important;
         border-radius: 10px !important;
     }
     div[data-baseweb="input"] input {
@@ -259,11 +266,16 @@ if st.session_state.stage == "menu":
             st.session_state.stage = "settings"
             st.rerun()
 
-# 2. EKRAN: LOBİ
+# 2. EKRAN: LOBİ (KALE & FİLE KONSEPTİ)
 elif st.session_state.stage == "settings":
     mode_title = "PİYASA DEĞERİ" if st.session_state.game_mode == "market" else "BOY TAHMİNİ"
-    st.markdown(f'<div class="main-title">{mode_title}</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Oyuncu isimlerini belirleyin:</div>', unsafe_allow_html=True)
+    
+    # Kalenin üst direği ve file çerçevesinin başlangıcı
+    st.markdown(f"""
+    <div class="goal-frame">
+        <div class="main-title">{mode_title}</div>
+        <div class="sub-title">Oyuncu isimlerini belirleyin:</div>
+    """, unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
     with c1:
@@ -292,6 +304,9 @@ elif st.session_state.stage == "settings":
     if st.button("← Ana Menüye Dön"):
         st.session_state.stage = "menu"
         st.rerun()
+
+    # Kalenin kapanış div'i
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # 3. EKRAN: OYUN ALANI
 elif st.session_state.stage == "game":
