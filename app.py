@@ -3,19 +3,27 @@ import pandas as pd
 import random
 
 # Sayfa Yapılandırması
-st.set_page_config(page_title="Agalarla Oyun", page_icon="⚽", layout="centered")
+st.set_page_config(page_title="Target Football", page_icon="⚽", layout="centered")
 
-# Gri Arka Plan & Canlı Açık Mavi Tema
+# Hareketli Gradient Arka Plan & Canlı Açık Mavi Tema
 st.markdown("""
 <style>
-    /* Tüm Sayfa ve Arka Plan */
+    /* Hareketli Arka Plan Gradyan Animasyonu */
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
     html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #1e242c !important;
+        background: linear-gradient(-45deg, #0f172a, #1e293b, #0d1e30, #1e242c) !important;
+        background-size: 400% 400% !important;
+        animation: gradientBG 12s ease infinite !important;
         color: #f8fafc !important;
     }
     
     header[data-testid="stHeader"] {
-        background-color: #1e242c !important;
+        background-color: transparent !important;
     }
 
     .main-title {
@@ -50,7 +58,7 @@ st.markdown("""
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        transition: all 0.25s ease-in-out !important;
+        transition: all 0.2s ease-in-out !important;
         box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35) !important;
         padding: 16px !important;
     }
@@ -71,9 +79,9 @@ st.markdown("""
         text-align: center !important;
     }
 
-    /* En Üstteki Menüye Dön Butonu İçin Özel Stil */
+    /* En Üstteki Menüye Dön Butonu */
     div.stButton > button[key="btn_top_menu"] {
-        background: #242b35 !important;
+        background: rgba(36, 43, 53, 0.8) !important;
         color: #94a3b8 !important;
         border: 1px solid #334155 !important;
         border-radius: 8px !important;
@@ -90,7 +98,7 @@ st.markdown("""
         transform: none !important;
     }
 
-    /* Diğer Standart Butonlar (Kadroya Ekle, Oyunu Başlat vb.) */
+    /* Diğer Standart Butonlar */
     div.stButton > button:not([key="btn_market"]):not([key="btn_height"]):not([key="btn_top_menu"]) {
         width: 100% !important;
         background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
@@ -112,7 +120,8 @@ st.markdown("""
 
     /* Kart Panelleri */
     .target-card {
-        background-color: #27303c !important;
+        background: rgba(39, 48, 60, 0.85) !important;
+        backdrop-filter: blur(8px);
         border: 2px solid #3b4758 !important;
         border-radius: 16px;
         padding: 20px;
@@ -128,7 +137,8 @@ st.markdown("""
         margin: 8px 0;
     }
     .score-card {
-        background-color: #27303c !important;
+        background: rgba(39, 48, 60, 0.85) !important;
+        backdrop-filter: blur(8px);
         border: 1px solid #3b4758 !important;
         border-radius: 14px;
         padding: 16px;
@@ -144,7 +154,7 @@ st.markdown("""
 
     /* Input Alanları */
     div[data-baseweb="input"], div[data-baseweb="select"] > div {
-        background-color: #27303c !important;
+        background-color: rgba(39, 48, 60, 0.9) !important;
         border: 1px solid #3b4758 !important;
         border-radius: 10px !important;
     }
@@ -178,7 +188,7 @@ if "stage" not in st.session_state:
 
 # 1. EKRAN: GİRİŞ MENÜSÜ
 if st.session_state.stage == "menu":
-    st.markdown('<div class="main-title">AGALARLA OYUN</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">TARGET FOOTBALL</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Oynamak istediğiniz modu seçin:</div>', unsafe_allow_html=True)
 
     _, center_col, _ = st.columns([1, 1.2, 1])
@@ -211,7 +221,6 @@ elif st.session_state.stage == "settings":
         st.session_state.p1_name = p1_input.strip() if p1_input.strip() else "Oyuncu 1"
         st.session_state.p2_name = p2_input.strip() if p2_input.strip() else "Oyuncu 2"
 
-        # Hedef Belirleme: 30M - 350M
         if st.session_state.game_mode == "market":
             st.session_state.target = random.randint(30, 350) * 1_000_000
         else:
@@ -231,7 +240,6 @@ elif st.session_state.stage == "settings":
 
 # 3. EKRAN: OYUN ALANI
 elif st.session_state.stage == "game":
-    # EN ÜST: Menüye Dön Butonu
     top_col1, _ = st.columns([1, 4])
     with top_col1:
         if st.button("← Ana Menü", key="btn_top_menu"):
