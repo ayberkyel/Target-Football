@@ -5,29 +5,81 @@ import random
 # Sayfa Yapılandırması
 st.set_page_config(page_title="Target Football", page_icon="⚽", layout="centered")
 
-# Hareketli Gradient Arka Plan & Canlı Açık Mavi Tema
+# Seken Futbol Topları & Canlı Tema
 st.markdown("""
 <style>
-    /* Hareketli Arka Plan Gradyan Animasyonu */
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    html, body, [data-testid="stAppViewContainer"], .stApp {
-        background: linear-gradient(-45deg, #0f172a, #1e293b, #0d1e30, #1e242c) !important;
-        background-size: 400% 400% !important;
-        animation: gradientBG 12s ease infinite !important;
-        color: #f8fafc !important;
-    }
-    
-    header[data-testid="stHeader"] {
+    /* Streamlit katmanlarını şeffaf yap */
+    header, [data-testid="stHeader"], [data-testid="stSidebar"], 
+    .main, [data-testid="stAppViewContainer"] > section,
+    [data-testid="stVerticalBlock"] {
+        background: transparent !important;
         background-color: transparent !important;
     }
 
+    /* Arka Plan Koyu Zemin */
+    html, body, [data-testid="stAppViewContainer"], .stApp {
+        background-color: #0c121e !important;
+        color: #f8fafc !important;
+        overflow-x: hidden !important;
+    }
+
+    /* --- SEKEN FUTBOL TOPLARI ANİMASYONU --- */
+    .balls-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none; /* Tıklamaları butonlara geçirir */
+    }
+
+    .ball {
+        position: absolute;
+        bottom: -80px;
+        user-select: none;
+        animation: bounceFloat 14s infinite linear;
+    }
+
+    @keyframes bounceFloat {
+        0% {
+            transform: translateY(0) rotate(0deg) scale(0.9);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.35;
+        }
+        50% {
+            transform: translateY(-55vh) translateX(60px) rotate(360deg) scale(1.1);
+            opacity: 0.45;
+        }
+        85% {
+            opacity: 0.35;
+        }
+        100% {
+            transform: translateY(-115vh) translateX(-40px) rotate(720deg) scale(0.9);
+            opacity: 0;
+        }
+    }
+
+    /* Farklı konumlarda, hızlarda ve boyutlarda toplar */
+    .b1 { left: 8%;  font-size: 38px; animation-duration: 11s; animation-delay: 0s; }
+    .b2 { left: 24%; font-size: 55px; animation-duration: 16s; animation-delay: 2s; }
+    .b3 { left: 45%; font-size: 32px; animation-duration: 13s; animation-delay: 4.5s; }
+    .b4 { left: 68%; font-size: 60px; animation-duration: 18s; animation-delay: 1s; }
+    .b5 { left: 86%; font-size: 42px; animation-duration: 12s; animation-delay: 6s; }
+    .b6 { left: 15%; font-size: 48px; animation-duration: 15s; animation-delay: 8s; }
+    .b7 { left: 78%; font-size: 35px; animation-duration: 14s; animation-delay: 9.5s; }
+
+    /* İçerikleri öne al */
+    .main-title, .sub-title, div.stButton, .target-card, .score-card {
+        position: relative;
+        z-index: 1;
+    }
+
     .main-title {
-        font-size: 44px;
+        font-size: 46px;
         font-weight: 900;
         font-style: italic;
         color: #38bdf8 !important;
@@ -42,7 +94,7 @@ st.markdown("""
         margin-bottom: 35px;
     }
 
-    /* Giriş Menüsü Açık Mavi Kare Kart Butonlar */
+    /* Menü Kart Butonları */
     div.stButton > button[key="btn_market"], div.stButton > button[key="btn_height"] {
         background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
         background-color: #0284c7 !important;
@@ -58,14 +110,13 @@ st.markdown("""
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        transition: all 0.2s ease-in-out !important;
+        transition: all 0.25s ease-in-out !important;
         box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35) !important;
         padding: 16px !important;
     }
 
     div.stButton > button[key="btn_market"]:hover, div.stButton > button[key="btn_height"]:hover {
         background: linear-gradient(135deg, #7dd3fc, #0ea5e9) !important;
-        background-color: #0ea5e9 !important;
         transform: translateY(-4px) scale(1.02) !important;
         box-shadow: 0 12px 28px rgba(56, 189, 248, 0.5) !important;
     }
@@ -79,9 +130,9 @@ st.markdown("""
         text-align: center !important;
     }
 
-    /* En Üstteki Menüye Dön Butonu */
+    /* Üst Menüye Dön Butonu */
     div.stButton > button[key="btn_top_menu"] {
-        background: rgba(36, 43, 53, 0.8) !important;
+        background: rgba(36, 43, 53, 0.85) !important;
         color: #94a3b8 !important;
         border: 1px solid #334155 !important;
         border-radius: 8px !important;
@@ -95,10 +146,9 @@ st.markdown("""
         background: #334155 !important;
         color: #38bdf8 !important;
         border-color: #38bdf8 !important;
-        transform: none !important;
     }
 
-    /* Diğer Standart Butonlar */
+    /* Standart Aksiyon Butonları */
     div.stButton > button:not([key="btn_market"]):not([key="btn_height"]):not([key="btn_top_menu"]) {
         width: 100% !important;
         background: linear-gradient(135deg, #38bdf8, #0284c7) !important;
@@ -113,21 +163,16 @@ st.markdown("""
         margin-top: 10px !important;
     }
 
-    div.stButton > button:not([key="btn_market"]):not([key="btn_height"]):not([key="btn_top_menu"]):hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 18px rgba(56, 189, 248, 0.5) !important;
-    }
-
     /* Kart Panelleri */
     .target-card {
-        background: rgba(39, 48, 60, 0.85) !important;
+        background: rgba(30, 41, 59, 0.85) !important;
         backdrop-filter: blur(8px);
-        border: 2px solid #3b4758 !important;
+        border: 2px solid #38bdf8 !important;
         border-radius: 16px;
         padding: 20px;
         text-align: center;
         margin-bottom: 24px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 6px 24px rgba(56, 189, 248, 0.2);
     }
     .target-number {
         font-size: 46px;
@@ -137,9 +182,9 @@ st.markdown("""
         margin: 8px 0;
     }
     .score-card {
-        background: rgba(39, 48, 60, 0.85) !important;
+        background: rgba(30, 41, 59, 0.8) !important;
         backdrop-filter: blur(8px);
-        border: 1px solid #3b4758 !important;
+        border: 1px solid #334155 !important;
         border-radius: 14px;
         padding: 16px;
         text-align: center;
@@ -152,16 +197,26 @@ st.markdown("""
         margin: 4px 0;
     }
 
-    /* Input Alanları */
     div[data-baseweb="input"], div[data-baseweb="select"] > div {
-        background-color: rgba(39, 48, 60, 0.9) !important;
-        border: 1px solid #3b4758 !important;
+        background-color: rgba(30, 41, 59, 0.95) !important;
+        border: 1px solid #334155 !important;
         border-radius: 10px !important;
     }
     div[data-baseweb="input"] input {
         color: #ffffff !important;
     }
 </style>
+
+<!-- Arka Planda Dönen & Seken Toplar -->
+<div class="balls-container">
+    <div class="ball b1">⚽</div>
+    <div class="ball b2">⚽</div>
+    <div class="ball b3">⚽</div>
+    <div class="ball b4">⚽</div>
+    <div class="ball b5">⚽</div>
+    <div class="ball b6">⚽</div>
+    <div class="ball b7">⚽</div>
+</div>
 """, unsafe_allow_html=True)
 
 # Veriyi oku
